@@ -1,0 +1,28 @@
+{
+  "name": "request",
+  "version": "1.0.0",
+  "description": "查询中国银行外汇牌价：欧元-人民币汇率信息",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vivi-wu/boc-spider.git"
+  },
+  "keywords": [
+    "spider"
+  ],
+  "author": "Vivienne WU",
+  "bugs": {
+    "url": "https://github.com/Vivi-wu/boc-spider/issues"
+  },
+  "homepage": "https://github.com/Vivi-wu/boc-spider#readme",
+  "dependencies": {
+    "browser-sync": "^2.26.3",
+    "cheerio": "^0.22.0",
+    "extend": "^3.0.2",
+    "request": "^2.79.0"
+  },
+  "license": "ISC"
+}
