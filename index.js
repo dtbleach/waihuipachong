@@ -5,7 +5,7 @@ var request = require('request'),
 
 var arryData = [],
       pageNum = 1,
-   maxPageNum = 13;
+   maxPageNum = 6329;
 
 var d="";
 
@@ -74,8 +74,8 @@ function fetchInfo() {
             method: 'POST',
             form: {
                 pjname: 1316,
-                erectDate:'2018-11-26',
-                nothing:'2018-11-27',
+                erectDate:'2016-01-01',
+                nothing:'2018-11-28',
                 page: pageNum++
             }
         }, reqCallback)
@@ -90,9 +90,21 @@ function fetchInfo() {
                 hash[arryData[i]] = true;  
             }  
         }  
-        fs.writeFile('./app/data.json', JSON.stringify(result), function(err) {
-            if (err) throw err;
-            console.log('数据保存成功');
+        var data = fs.readFileSync('./app/data.json', 'utf8');
+        var jsonstr=JSON.stringify(result);
+         if(data.length>0){
+             data=data.substr(0,data.length-1)+",";
+             jsonstr=jsonstr.substr(1,jsonstr.length);
+             jsonstr=data+jsonstr;
+            
+         }   
+        // fs.appendFile('./app/data.json', jsonstr, function (err) {
+        //     if (err) throw err;
+        //     console.log('追加内容完成');
+        //   });
+        fs.writeFile('./app/data.json', jsonstr, function(err) {
+           if (err) throw err;
+           console.log('数据保存成功');
         })
         // 前台展示数据
         browserSync.init({
