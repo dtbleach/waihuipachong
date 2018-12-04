@@ -3,26 +3,14 @@ var request = require('request'),
     fs = require("fs"),
     browserSync = require("browser-sync").create();
 
+const sql = require("msnodesqlv8");
+const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.76.1.20,1433;Database=ERP4;Uid=ld;Pwd=ld;";
 var arryData = [],
       pageNum = 1,
-   maxPageNum = 6329;
+   maxPageNum = 4470;
 
 var d="";
 
-Array.prototype.delrepeat = function(){  
-    //将数组进行排序  
-    this.sort();  
-    //定义结果数组  
-    var arr=[];  
-    for(var i = 1; i < this.length; i++){    //从数组第二项开始循环遍历数组  
-        //判断相邻两个元素是否相等，如果相等说明数据重复，否则将元素写入结果数组  
-        if(this[i] !== arr[arr.length - 1]){  
-            arr.push(this[i]);  
-        }              
-    }  
-    return arr;  
-      
-}
 
 // Callback of the simplified HTTP request client
 function reqCallback(err, response, body) {
@@ -52,13 +40,15 @@ function reqCallback(err, response, body) {
                     d=timestr;
                 }
             }
-           
-            arryTmp.push((Number($child.eq(5).text())/100).toFixed(2))//中行折算价
+            var price=(Number($child.eq(5).text())/100).toFixed(2)
+            arryTmp.push(price)//中行折算价
             arryTmp.push(timestr) // 发布时间
 
             arryData.push(arryTmp)
+
             arryTmp = []
         }
+
 
         fetchInfo()
     }
@@ -74,8 +64,8 @@ function fetchInfo() {
             method: 'POST',
             form: {
                 pjname: 1316,
-                erectDate:'2016-01-01',
-                nothing:'2018-11-28',
+                erectDate:'2017-01-01',
+                nothing:'2018-12-04',
                 page: pageNum++
             }
         }, reqCallback)
@@ -90,22 +80,30 @@ function fetchInfo() {
                 hash[arryData[i]] = true;  
             }  
         }  
-        var data = fs.readFileSync('./app/data.json', 'utf8');
-        var jsonstr=JSON.stringify(result);
-         if(data.length>0){
-             data=data.substr(0,data.length-1)+",";
-             jsonstr=jsonstr.substr(1,jsonstr.length);
-             jsonstr=data+jsonstr;
+        //var data = fs.readFileSync('./app/data.json', 'utf8');
+        // var jsonstr=JSON.stringify(result);
+        // if(data.length>0){
+        //     data=data.substr(0,data.length-1)+",";
+        //     jsonstr=jsonstr.substr(1,jsonstr.length);
+        //     jsonstr=data+jsonstr;
             
-         }   
+        // }
+        for(var i=0,len =result.length; i<len;i++)
+        {
+            let sqlquery = "INSERT INTO 外销电商_爬虫数据USDCNY(publishdate,source,price,type) VALUES('" + result[i][1] + "','中国银行'," + result[i][0] + ",1)"
+            sql.query(connectionString, sqlquery, (err, rows) => {
+                console.log(rows);
+                console.log(err);
+            });
+        }
         // fs.appendFile('./app/data.json', jsonstr, function (err) {
         //     if (err) throw err;
         //     console.log('追加内容完成');
         //   });
-        fs.writeFile('./app/data.json', jsonstr, function(err) {
-           if (err) throw err;
-           console.log('数据保存成功');
-        })
+        //fs.writeFile('./app/data.json', jsonstr, function(err) {
+           //if (err) throw err;
+           //console.log('数据保存成功');
+        //})
         // 前台展示数据
         browserSync.init({
             server: "./app",
