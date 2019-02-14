@@ -22,7 +22,9 @@
     "browser-sync": "^2.26.3",
     "cheerio": "^0.22.0",
     "extend": "^3.0.2",
-    "request": "^2.79.0"
+    "msnodesqlv8": "^0.6.12",
+    "request": "^2.79.0",
+    "superagent": "^4.1.0"
   },
   "license": "ISC"
 }

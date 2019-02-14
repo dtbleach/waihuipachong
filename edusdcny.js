@@ -85,7 +85,7 @@ function reqCallback(err, response, body) {
 
 // 请求数据
 function fetchInfo() {
-    var yestoday=getYestoday();
+    var yestoday= getYestoday();
     console.log('开始抓取昨天数据...');
     request({
         url: 'http://srh.bankofchina.com/search/whpj/search.jsp',
