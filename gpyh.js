@@ -6,7 +6,7 @@ const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.76.1
 
 var arryData = [],
     pageNum = 1,
-    maxPageNum = 70;
+    maxPageNum = 54;
 
 const base_header={
     Host: 'www.gpyh.com',
@@ -65,11 +65,14 @@ function login() {
 function getContent (cookie) {
     //console.log(cookie);
     for(p=pageNum;p<=maxPageNum;p++) {
-        console.log(p);
-        var url1="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum="+p+
-            "&searchKey=5783&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+        //console.log(p);
+        var pin1='GB5783';
+        var pin2='GB5782';
+        var pin3='GB70.1';
+        var pin4='GB70-76';
+        var pin5='%e7%89%b930';
         var url2="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum="+p+
-            "&searchKey=5782&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+            "&searchKey="+pin5+"&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
         superagent.get(url2)             //随便论坛里的一个地址
             .set("Cookie", cookie)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
             .end(function (err, sres) {
@@ -78,25 +81,44 @@ function getContent (cookie) {
                     throw err;
                 }
                 //console.log(sres.text);
+
                 var $ = cheerio.load(sres.text),
                     $tr = $('.goods-table-body tr'),
-                    i = 1, len = $tr.length-1 , $child = '';
-
+                    i = 1, len = $tr.length - 1, $child = '';
                 for (i; i <= len; i++) {
-                    var img=$tr.eq(i).children().eq(0).find('img').attr('src').substr(2)
-                    var title=$tr.eq(i).children().eq(0).find('.goods-txt-name').find('a').attr('title');
-                    title=title.replace(/\s+/g, ' ').split(' ');
-                    var pinpai=$tr.eq(i).children().eq(2).text().trim();
-                    var cangku=$tr.eq(i).children().eq(3).text().trim();
-                    var package=$tr.eq(i).children().eq(4).find('.pkg-info').text().trim();
-                    var kucun=$tr.eq(i).children().eq(5).children().text().trim();
-                    var price=$tr.eq(i).children().eq(7).find('span[id^=sale_price]').attr('dir').trim();
-                    let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + title[0] + "','"+title[1]+"','"+title[2]+"','"+title[3]+"','"+title[4]+"','"+img+"','"+pinpai+"','"+cangku+"','"+kucun+"','"+package+"','"+price+"','工品一号')"
-                    sql.query(connectionString, sqlquery, (err, rows) => {
-                        console.log(rows);
-                        console.log(err);
-                    });
+                    try {
+
+                        if($tr.eq(i).attr('class')=='section-item'){
+
+
+                            var img = '' + $tr.eq(i).children().eq(0).find('img').attr('src');
+
+                            if (img != 'undefined') {
+                                if(img!='/static/dist/img/zwtp1.jpg')
+                                    img = img.substr(2);
+                                else
+                                    img='www.gpyh.com'+img;
+
+                            }
+                            var title = $tr.eq(i).children().eq(0).find('.goods-txt-name').find('a').attr('title');
+                            title = title.replace(/\s+/g, ' ').split(' ');
+                            var pinpai = $tr.eq(i).children().eq(2).text().trim();
+                            var cangku = $tr.eq(i).children().eq(3).text().trim();
+                            var package = $tr.eq(i).children().eq(4).find('.pkg-info').text().trim();
+                            var kucun = $tr.eq(i).children().eq(5).children().text().trim();
+                            var price = $tr.eq(i).children().eq(7).find('span[id^=sale_price]').attr('dir').trim();
+                            let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + title[0] + "','"+title[1]+"','"+title[2]+"','"+title[3]+"','"+title[4]+"','"+img+"','"+pinpai+"','"+cangku+"','"+kucun+"','"+package+"','"+price+"','工品一号')"
+                            sql.query(connectionString, sqlquery, (err, rows) => {
+                                console.log(rows);
+                                console.log(err);
+                            });
+
+                        }
+                    }catch (e) {
+                        console.log(e);
+                    }
                 }
+
 
             })
     }
