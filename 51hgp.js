@@ -33,7 +33,7 @@ function login() {
         .type('form')
         .send('Mobile=13801925705&Password=KnMSYglLt16YdptUzJflePcxkKHmMK%2Fzr%2FC19rAAQ9eRSPjLGFx7dZUa55t9%252Bk8p4%252B6JbKDCYDvEQs%2F2UrNFUMJ3BglSFBEQVZHL6BBRys0ep%2FtwNche0rIo2uVvnNBbKrU63EG8UCFEU780Zndcle0WhWE%2FmPjoTiqfAtoeEeQ%3D')
         .end(function (err,res) {
-            console.log(res);
+            //console.log(res);
             if(err) throw err;
             var cookie = res.header['set-cookie']
             emitter.emit("setCookeie", cookie)
@@ -42,7 +42,7 @@ function login() {
 
 function getContent (cookie) {
     console.log(cookie);
-    superagent.get("https://www.51hgp.com/RegionGoods/Goods?Category_Top_ID=1&Category_Sec_ID=2&Standard_ID=2&TenantID=3741&RID=7")             //随便论坛里的一个地址
+    superagent.get("https://www.51hgp.com/Search?page=1&Namedbrand=False&DirectSell=False&keyword=5783&tenantid=3741#good-style")             //随便论坛里的一个地址
         .set("Cookie", cookie)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
         .end(function(err, sres){
             if (err){
