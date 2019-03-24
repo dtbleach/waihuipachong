@@ -2,13 +2,14 @@ var superagent = require('superagent');
 var events = require("events");
 var cheerio = require('cheerio');
 const sql = require("msnodesqlv8");
-const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
+//const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
+const connectionString = "Driver={SQL Server Native Client 11.0};Server=.,1433;Database=Crawler;Uid=sa;Pwd=leon1986;";
 
 var arryData = [],
     pageNum = 1,
     maxPageNum = 104;
 
-const base_header={
+const base_header = {
     Host: 'www.gpyh.com',
     Connection: 'keep-alive',
     Accept: 'application/json, text/javascript, */*; q=0.01',
@@ -22,8 +23,7 @@ const base_header={
 }
 
 
-const login_url='https://www.gpyh.com/passport/login'
-
+const login_url = 'https://www.gpyh.com/passport/login'
 
 
 var emitter = new events.EventEmitter()
@@ -32,37 +32,33 @@ login()
 emitter.on("setCookeie", getContent)
 
 
-
 function login() {
-    var area='';
+    var area = '';
     superagent.post("https://www.gpyh.com/area/setAreaToCookid?provinceId=861&cityId=3524&provinceName=%E4%B8%8A%E6%B5%B7%E5%B8%82&cityName=%E4%B8%8A%E6%B5%B7%E5%B8%82")             //随便论坛里的一个地址
         .set(base_header)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-        .end(function(err, sres){
+        .end(function (err, sres) {
             // console.log(sres);
-            if (err){
+            if (err) {
                 throw err;
             }
             var cookie = sres.header['set-cookie'];
-
-            //console.log(cookie);
-            for(u=0;u<cookie.length;u++){
-                console.log(cookie[u]);
-                if(cookie[u].search("GPYH_AREA")==-1){
-                    area=cookie[u];
+            for (u = 0; u < cookie.length; u++) {
+                //console.log(cookie[u]);
+                if (cookie[u].indexOf("GPYH_AREA") != -1) {
+                    area = cookie[u];
+                    console.log(cookie[u])
                 }
             }
-            //area=cookie[1];
-            console.log(area);
             superagent.post(login_url)
                 .set(base_header)
                 .type('form')
                 .send('username=13801925705&password=a123456&isRemember=')
-                .end(function (err,res) {
+                .end(function (err, res) {
                     //console.log(res);
-                    if(err) throw err;
+                    if (err) throw err;
                     var cookie = res.header['set-cookie'];
                     //console.log(cookie);
-                   // console.log((area))
+                    // console.log((area))
                     cookie.push(area);
                     console.log(cookie);
                     emitter.emit("setCookeie", cookie);
@@ -70,56 +66,63 @@ function login() {
         })
 }
 
-function getContent (cookie) {
+function getContent(cookie) {
     //console.log(cookie);
-    var pin1='GB5783';
-    var pin2='GB5782';
-    var pin3='GB70.1';
-    var pin4='GB70-76';
-    var pin5='%e7%89%b930';
-    var str=[pin1,pin2,pin3,pin4,pin5];
+    var pin1 = 'GB5783';
+    var pin2 = 'GB5782';
+    var pin3 = 'GB70.1';
+    var pin4 = 'GB70-76';
+    var pin5 = '%e7%89%b930';
+    var str = [pin1, pin2, pin3, pin4, pin5];
     //for(o=0;0<str.length;o++){
-    //     var urlpage="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=1&searchKey="+pin1+"&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
-    //     superagent.get(urlpage)
-    //         .set("Cookie", cookie) //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-    //         .end(function (err, sres) {
-    //             var $ = cheerio.load(sres.text),
-    //                 $tr=$('.total');
-    //             console.log($.html());
-    //             var page=$tr.html();
-    //             console.log(page);
-    //
-    //         })
-        for(p=pageNum;p<=maxPageNum;p++) {
-            //console.log(p);
+    str.forEach(function (ck) {
+        var urlpage = "https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=1&searchKey=" + ck + "&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+        superagent.get(urlpage)
+            .set("Cookie", cookie) //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
+            .end(function (err, sres) {
 
-            var url2="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum="+p+
-                "&searchKey="+pin1+"&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
-            superagent.get(url2)             //随便论坛里的一个地址
-                .set("Cookie", cookie)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-                .end(function (err, sres) {
-                    // console.log(sres);
-                    if (err) {
-                        throw err;
-                    }
+                if (err) {
+                    console.log(err)
+                    throw err;
+                }
+                var $ = cheerio.load(sres.text),
+                    $page = $('.total');
+                //console.log($.html());
+                var page = $page.html();
+                page = page.replace('&#x5171;', '');
+                page = page.replace('&#x9875;', '');
+                page = Number(page);
+                for (p = 1; p <= page; p++) {
+                    //console.log(p);
+
+                    // var url2="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum="+p+
+                    //     "&searchKey="+ck+"&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+                    // superagent.get(url2)             //随便论坛里的一个地址
+                    //     .set("Cookie", cookie)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
+                    //     .end(function (err, sres) {
+                    //         // console.log(sres);
+                    //         if (err) {
+                    //             console.log(err)
+                    //             throw err;
+                    //         }
                     //console.log(sres.text);
 
-                    var $ = cheerio.load(sres.text),
-                        $tr = $('.goods-table-body tr'),
+                    //  var $ = cheerio.load(sres.text)
+                    var $tr = $('.goods-table-body tr'),
                         i = 1, len = $tr.length - 1, $child = '';
                     for (i; i <= len; i++) {
                         try {
 
-                            if($tr.eq(i).attr('class')=='section-item'){
+                            if ($tr.eq(i).attr('class') == 'section-item') {
 
 
                                 var img = '' + $tr.eq(i).children().eq(0).find('img').attr('src');
 
                                 if (img != 'undefined') {
-                                    if(img!='/static/dist/img/zwtp1.jpg')
+                                    if (img != '/static/dist/img/zwtp1.jpg')
                                         img = img.substr(2);
                                     else
-                                        img='www.gpyh.com'+img;
+                                        img = 'www.gpyh.com' + img;
 
                                 }
                                 var title = $tr.eq(i).children().eq(0).find('.goods-txt-name').find('a').attr('title');
@@ -130,36 +133,38 @@ function getContent (cookie) {
                                 var kucun = $tr.eq(i).children().eq(5).children().text().trim();
                                 var price = $tr.eq(i).children().eq(7).find('span[id^=sale_price]').attr('dir').trim();
 
-                                var caizhi=title[0];
-                                var pinming=title[1];
-                                var guige=title[2];
-                                var dengji='';
-                                var biaomian='';
-                                var fenlei='';
-                                if(title.length==6){
-                                    dengji=title[3];
-                                    biaomian=title[4];
-                                    fenlei=title[5];
+                                var caizhi = title[0];
+                                var pinming = title[1];
+                                var guige = title[2];
+                                var dengji = '';
+                                var biaomian = '';
+                                var fenlei = '';
+                                if (title.length == 6) {
+                                    dengji = title[3];
+                                    biaomian = title[4];
+                                    fenlei = title[5];
                                 }
-                                if(title.length==5){
-                                    biaomian=title[3];
-                                    fenlei=title[4];
+                                if (title.length == 5) {
+                                    biaomian = title[3];
+                                    fenlei = title[4];
                                 }
 
-                                // let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" +caizhi + "','"+pinming+"','"+guige+"','"+dengji+"','"+biaomian+"','"+fenlei+"','"+img+"','"+pinpai+"','"+cangku+"','"+kucun+"','"+package+"','"+price+"','工品一号')"
-                                // sql.query(connectionString, sqlquery, (err, rows) => {
-                                //     console.log(rows);
-                                //     console.log(err);
-                                // });
-                                console.log(price);
+                                let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" +caizhi + "','"+pinming+"','"+guige+"','"+dengji+"','"+biaomian+"','"+fenlei+"','"+img+"','"+pinpai+"','"+cangku+"','"+kucun+"','"+package+"','"+price+"','工品一号')"
+                                sql.query(connectionString, sqlquery, (err, rows) => {
+                                    console.log(rows);
+                                    console.log(err);
+                                });
+                                //console.log(price);
                             }
-                        }catch (e) {
+                        } catch (e) {
                             console.log(e);
                         }
                     }
 
 
-                })
-        }
-    //}
+                    //  })
+                }
+            })
+
+    })
 };

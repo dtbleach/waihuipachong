@@ -4,7 +4,7 @@ var request = require('request'),
     browserSync = require("browser-sync").create();
 
 const sql = require("msnodesqlv8");
-const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.76.1.20,1433;Database=ERP4;Uid=ld;Pwd=ld;";
+const connectionString = "Driver={SQL Server Native Client 11.0};Server=127.0.0.1,1433;Database=t66y;Uid=sa;Pwd=leon1986;";
 var arryData = [],
       pageNum = 1,
    maxPageNum = 4470;
