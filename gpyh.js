@@ -1,9 +1,12 @@
 var superagent = require('superagent');
 var events = require("events");
 var cheerio = require('cheerio');
+var async = require('async')
 const sql = require("msnodesqlv8");
-const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
-global.arryData=[];
+
+//const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
+const connectionString = "Driver={SQL Server Native Client 11.0};Server=.,1433;Database=Crawler;Uid=sa;Pwd=leon1986;";
+
 
 
 class Ut {
@@ -41,6 +44,7 @@ var emitter = new events.EventEmitter()
 
 login()
 emitter.on("setCookeie", getContent)
+emitter.on("goto", urlzhua)
 
 
 function login() {
@@ -87,127 +91,122 @@ function getContent(cookie) {
     var str = [pin1, pin2, pin3, pin4, pin5];
 
 
-    var obj =[];
+    var obj = [];
     str.forEach(function (ck) {
-            var urlpage = "https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=1&searchKey=" + ck + "&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
-            superagent.get(urlpage)
-                .set("Cookie", cookie) //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-                .end(function (err, sres) {
+        var urlpage = "https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=1&searchKey=" + ck + "&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+        superagent.get(urlpage)
+            .set("Cookie", cookie) //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
+            .end(function (err, sres) {
 
-                    if (err) {
-                        console.log(err)
-                        throw err;
-                    }
-                    var $ = cheerio.load(sres.text),
-                        $page = $('.total');
-                    //console.log($.html());
-                    var page = $page.html();
+                if (err) {
+                    console.log(err)
+                    throw err;
+                }
+                var $ = cheerio.load(sres.text),
+                    $page = $('.total');
+                //console.log($.html());
+                var page = $page.html();
 
-                    page = page.replace('&#x5171;', '');
-                    page = page.replace('&#x9875;', '');
-                    page = Number(page);
-                    var mod = {
-                        'key': ck,
-                        'value': page
+                page = page.replace('&#x5171;', '');
+                page = page.replace('&#x9875;', '');
+                page = Number(page);
+                var mod = {
+                    'key': ck,
+                    'value': page
 
-                    }
-                    arryData.push(mod);
-                    console.log(mod.value);
-                })
-        })
+                }
 
-        //for(o=0;0<str.length;o++){
-    arryData.forEach(function (ck) {
-            for (p = 1; p <= ck.value; p++) {
-                var urlpage = "https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=" + p + "&searchKey=" + ck.key + "&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
-                superagent.get(urlpage)
-                    .set("Cookie", cookie) //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-                    .end(function (err, sres) {
+                console.log(mod.value);
+                var arryData=[];
+                zhua(mod.value, mod.key, arryData);
 
-                        if (err) {
-                            console.log(err)
-                            throw err;
-                        }
-                        var $ = cheerio.load(sres.text)
-                        //   $page = $('.total');
-                        //console.log($.html());
-                        // var page = $page.html();
-                        // page = page.replace('&#x5171;', '');
-                        // page = page.replace('&#x9875;', '');
-                        // page = Number(page);
-
-                        //console.log(p);
-
-                        // var url2="https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum="+p+
-                        //     "&searchKey="+ck+"&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
-                        // superagent.get(url2)
-                        //     .set("Cookie", cookie)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
-                        //     .end(function (err, sres) {
-                        //         // console.log(sres);
-                        //         if (err) {
-                        //             console.log(err)
-                        //             throw err;
-                        //         }
-                        //console.log(sres.text);
-
-                        //  var $ = cheerio.load(sres.text)
-                        var $tr = $('.goods-table-body tr'),
-                            i = 1, len = $tr.length - 1, $child = '';
-                        for (i; i <= len; i++) {
-                            try {
-
-                                if ($tr.eq(i).attr('class') == 'section-item') {
-
-
-                                    var img = '' + $tr.eq(i).children().eq(0).find('img').attr('src');
-
-                                    if (img != 'undefined') {
-                                        if (img != '/static/dist/img/zwtp1.jpg')
-                                            img = img.substr(2);
-                                        else
-                                            img = 'www.gpyh.com' + img;
-
-                                    }
-                                    var title = $tr.eq(i).children().eq(0).find('.goods-txt-name').find('a').attr('title');
-                                    title = title.replace(/\s+/g, ' ').split(' ');
-                                    var pinpai = $tr.eq(i).children().eq(2).text().trim();
-                                    var cangku = $tr.eq(i).children().eq(3).text().trim();
-                                    var package = $tr.eq(i).children().eq(4).find('.pkg-info').text().trim();
-                                    var kucun = $tr.eq(i).children().eq(5).children().text().trim();
-                                    var price = $tr.eq(i).children().eq(7).find('span[id^=sale_price]').attr('dir').trim();
-
-                                    var caizhi = title[0];
-                                    var pinming = title[1];
-                                    var guige = title[2];
-                                    var dengji = '';
-                                    var biaomian = '';
-                                    var fenlei = '';
-                                    if (title.length == 6) {
-                                        dengji = title[3];
-                                        biaomian = title[4];
-                                        fenlei = title[5];
-                                    }
-                                    if (title.length == 5) {
-                                        biaomian = title[3];
-                                        fenlei = title[4];
-                                    }
-
-                                    // let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + img + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','工品一号')"
-                                    // sql.query(connectionString, sqlquery, (err, rows) => {
-                                    //     console.log(rows);
-                                    //     console.log(err);
-                                    // });
-                                    console.log(price);
-                                }
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        }
-
-
-                        //  })
-                    })
-            }
-        })
-
+                emitter.emit("goto", cookie,arryData);
+            })
+    })
 };
+
+function zhua(page, str,arryData) {
+    for (p = 1; p <= page; p++) {
+        var urlpage = "https://www.gpyh.com/quickbuy/goodsSearchPage?pageNum=" + p + "&searchKey=" + str + "&hasStock=&isSelfSell=&isNew=&barCode=&categoryJson=&materialJson=&goodsNameJson=&surfaceJson=&brandJson=&merchantJson=&diameterJson=&lengthJson=&gradeJson=&goodsStandardId=&finalCategoryId=&categoryId=&toolCategoryId=";
+        arryData.push(urlpage);
+    }
+}
+
+function urlzhua(cookie,arryData) {
+    var concurrencyCount = 0;
+    var fetch = function (url, callback) {
+        console.time('  耗时');
+        concurrencyCount++;
+        superagent.get(url).set("Cookie", cookie).end( function (err, res) {
+            console.log('并发数:', concurrencyCount--, 'fetch', url);
+            //var $ = cheerio.load(res.text);
+            callback(null, [url, res.text]);
+        });
+
+    }
+    async.mapLimit(arryData, 11, function (url, callback) {
+        fetch(url, callback);
+        console.timeEnd("  耗时");
+    }, function (err, result) {
+        result = result.map( function (pair) {
+            var $ = cheerio.load(pair[1]);
+            var $tr = $('.goods-table-body tr'),
+                i = 1, len = $tr.length - 1, $child = '';
+            for (i; i <= len; i++) {
+                try {
+
+                    if ($tr.eq(i).attr('class') == 'section-item') {
+
+
+                        var img = '' + $tr.eq(i).children().eq(0).find('img').attr('src');
+
+                        if (img != 'undefined') {
+                            if (img != '/static/dist/img/zwtp1.jpg')
+                                img = img.substr(2);
+                            else
+                                img = 'www.gpyh.com' + img;
+
+                        }
+                        var title = $tr.eq(i).children().eq(0).find('.goods-txt-name').find('a').attr('title');
+                        title = title.replace(/\s+/g, ' ').split(' ');
+                        var pinpai = $tr.eq(i).children().eq(2).text().trim();
+                        var cangku = $tr.eq(i).children().eq(3).text().trim();
+                        var package = $tr.eq(i).children().eq(4).find('.pkg-info').text().trim();
+                        var kucun = $tr.eq(i).children().eq(5).children().text().trim();
+                        var price = $tr.eq(i).children().eq(7).find('span[id^=sale_price]').attr('dir').trim();
+
+                        var caizhi = title[0];
+                        var pinming = title[1];
+                        var guige = title[2];
+                        var dengji = '';
+                        var biaomian = '';
+                        var fenlei = '';
+                        if (title.length == 6) {
+                            dengji = title[3];
+                            biaomian = title[4];
+                            fenlei = title[5];
+                        }
+                        if (title.length == 5) {
+                            biaomian = title[3];
+                            fenlei = title[4];
+                        }
+                        if(price!=undefined&&price!='undefined') {
+                            console.log(price);
+                            let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + img + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','工品一号')"
+                            sql.query(connectionString, sqlquery, (err, rows) => {
+                                //console.log(rows);
+                                if(err!=null&&err!=undefined&&err!='undefined'){
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        });
+        console.log('final:\n',result);
+    });
+}
+
