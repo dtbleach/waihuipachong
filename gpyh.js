@@ -144,7 +144,7 @@ function urlzhua(cookie,arryData) {
         });
 
     }
-    async.mapLimit(arryData, 11, function (url, callback) {
+    async.mapLimit(arryData, 1, function (url, callback) {
         fetch(url, callback);
         console.timeEnd("  耗时");
     }, function (err, result) {

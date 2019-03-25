@@ -38,3 +38,41 @@ ALTER TABLE [dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] ADD  CONSTRAINT [DF_ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊ
 GO
 
 
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT [id]
+      ,[²ÄÖÊ]
+      ,[Æ·Ãû]
+      ,[¹æ¸ñ]
+      ,[µÈ¼¶]
+      ,[±íÃæ´¦Àí]
+      ,[·ÖÀà]
+      ,[Í¼Æ¬]
+      ,[Æ·ÅÆ]
+      ,[²Ö¿â]
+      ,[¿â´æ]
+      ,[°ü×°ĞÅÏ¢]
+      ,[¼Û¸ñ]
+      ,[Êı¾İÀ´Ô´]
+      ,[¸üĞÂÈÕÆÚ]
+  FROM [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ]
+  where ²ÄÖÊ='35K(Ì¼¸Ö)' and Æ·Ãû='GB70-76'	and ¹æ¸ñ='M4*12' and µÈ¼¶='8.8¼¶' and ±íÃæ´¦Àí='À¶°×Ğ¿' and ·ÖÀà='ÄÚÁù½ÇÔ²ÖùÍ·»úÂİ¶¤' and Í¼Æ¬='p5.gpyh.com/webnew/img/standardConfig/5/6ce0d23f-ce2a-40d7-b3d5-44ae1e03034a.jpg' and Æ·ÅÆ='¹¤Ê¿' and ²Ö¿â='¼ÎĞË×ÔÓª²Ö' and ¿â´æ='21.6Ç§Ö§ÏÖ»õ'
+
+
+  --delete from Crawler.dbo.ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ
+
+delete from [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] where
+
+id in(select * from [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] group by ²ÄÖÊ,Æ·Ãû,¹æ¸ñ,µÈ¼¶,±íÃæ´¦Àí,·ÖÀà,Í¼Æ¬,Æ·ÅÆ,²Ö¿â,¿â´æ,°ü×°ĞÅÏ¢,¼Û¸ñ having count(1) >= 2)
+
+and id not in (select max(id)from [dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] group by id having count(1) >1)
+
+delete from  [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] where id in(SELECT max(a.id) FROM [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ] a,(
+SELECT ²ÄÖÊ,Æ·Ãû,¹æ¸ñ,µÈ¼¶,±íÃæ´¦Àí,·ÖÀà,Í¼Æ¬,Æ·ÅÆ,²Ö¿â,¿â´æ,°ü×°ĞÅÏ¢,¼Û¸ñ
+FROM [Crawler].[dbo].[ÍâÏúµçÉÌ_ÄÚÏúÅÀ³æÊı¾İ]
+GROUP BY ²ÄÖÊ,Æ·Ãû,¹æ¸ñ,µÈ¼¶,±íÃæ´¦Àí,·ÖÀà,Í¼Æ¬,Æ·ÅÆ,²Ö¿â,¿â´æ,°ü×°ĞÅÏ¢,¼Û¸ñ
+HAVING COUNT(1)>1
+
+) AS b
+WHERE a.²ÄÖÊ=b.²ÄÖÊ and a.Æ·Ãû=b.Æ·Ãû and a.¹æ¸ñ=b.¹æ¸ñ and a.µÈ¼¶=b.µÈ¼¶ and a.±íÃæ´¦Àí=b.±íÃæ´¦Àí and a.·ÖÀà=b.·ÖÀà and a.Í¼Æ¬=b.Í¼Æ¬ and a.Æ·ÅÆ=b.Æ·ÅÆ and a.²Ö¿â=b.²Ö¿â and a.¿â´æ=b.¿â´æ and a.°ü×°ĞÅÏ¢=b.°ü×°ĞÅÏ¢ and a.¼Û¸ñ=b.¼Û¸ñ
+)
+
