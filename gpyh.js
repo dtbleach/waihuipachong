@@ -4,24 +4,9 @@ var cheerio = require('cheerio');
 var async = require('async')
 const sql = require("msnodesqlv8");
 
-//const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
-const connectionString = "Driver={SQL Server Native Client 11.0};Server=.,1433;Database=Crawler;Uid=sa;Pwd=leon1986;";
+const connectionString = "Driver={SQL Server Native Client 11.0};Server=192.168.1.10,1433;Database=Crawler;Uid=sa;Pwd=sfiec_123;";
+//const connectionString = "Driver={SQL Server Native Client 11.0};Server=.,1433;Database=Crawler;Uid=sa;Pwd=leon1986;";
 
-
-
-class Ut {
-    /**
-     * 异步延迟
-     * @param {number} time 延迟的时间,单位毫秒
-     */
-    static sleep(time = 0) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, time);
-        })
-    };
-}
 
 const base_header = {
     Host: 'www.gpyh.com',
@@ -118,9 +103,13 @@ function getContent(cookie) {
 
                 console.log(mod.value);
                 var arryData=[];
+
                 zhua(mod.value, mod.key, arryData);
 
-                emitter.emit("goto", cookie,arryData);
+               emitter.emit("goto", cookie,arryData);
+               //  arryData.forEach(function (dd){
+               //      console.log(dd)
+               //  })
             })
     })
 };
@@ -134,19 +123,25 @@ function zhua(page, str,arryData) {
 
 function urlzhua(cookie,arryData) {
     var concurrencyCount = 0;
+    var tmpData=[];
     var fetch = function (url, callback) {
-        console.time('  耗时');
-        concurrencyCount++;
-        superagent.get(url).set("Cookie", cookie).end( function (err, res) {
-            console.log('并发数:', concurrencyCount--, 'fetch', url);
-            //var $ = cheerio.load(res.text);
-            callback(null, [url, res.text]);
-        });
+        if(tmpData.indexOf(url)==-1){
+            tmpData.push(url);
+            console.time('  耗时');
+            concurrencyCount++;
+            superagent.get(url).set("Cookie", cookie).end( function (err, res) {
+                console.log('并发数:', concurrencyCount--, 'fetch', url);
+                //var $ = cheerio.load(res.text);
+                callback(null, [url, res.text]);
+                });
+        }else{
+            console.log("重复的url: "+url);
+        }
 
     }
     async.mapLimit(arryData, 1, function (url, callback) {
-        fetch(url, callback);
-        console.timeEnd("  耗时");
+            fetch(url, callback);
+            console.timeEnd("  耗时");
     }, function (err, result) {
         result = result.map( function (pair) {
             var $ = cheerio.load(pair[1]);
