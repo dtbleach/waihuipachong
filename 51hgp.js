@@ -166,6 +166,9 @@ function urlzhua(cookie,arryData) {
                         i = 0,len = $tr.length,$child = '';
                     var fenlei =$head.eq(j).find('h2').text();
                     var tupian =$head.eq(j).find('img').attr('src');
+                    if(tupian!=undefined&&tupian!='undefined'){
+                        tupian=tupian.replace("https://","");
+                    }
                     console.log(fenlei);
                     for (i; i < len; i++) {
                         $child = $tr.eq(i).children();
@@ -182,7 +185,7 @@ function urlzhua(cookie,arryData) {
                         var price=$child.eq(10).find('.goodsPrice').attr('data-price');
                         var source='好工品';
                         console.log(pinpai+' '+caizhi+' '+guige+' '+dengji+' '+biaomian+' '+fenlei+' '+tupian+' '+cangku+' '+kucun+' '+price+' '+source);
-                        let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + img + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','好工品')"
+                        let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + tupian + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','好工品')"
                         sql.query(connectionString, sqlquery, (err, rows) => {
                             //console.log(rows);
                             if(err!=null&&err!=undefined&&err!='undefined'){

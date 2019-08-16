@@ -34,6 +34,8 @@ emitter.on("goto", urlzhua)
 
 function login() {
     var area = '';
+    var area64='';
+    var um='';
     superagent.post("https://www.gpyh.com/area/setAreaToCookid?provinceId=861&cityId=3524&provinceName=%E4%B8%8A%E6%B5%B7%E5%B8%82&cityName=%E4%B8%8A%E6%B5%B7%E5%B8%82")             //随便论坛里的一个地址
         .set(base_header)                 //在resquest中设置得到的cookie，只设置第四个足以（具体情况具体分析）
         .end(function (err, sres) {
@@ -44,10 +46,19 @@ function login() {
             var cookie = sres.header['set-cookie'];
             for (u = 0; u < cookie.length; u++) {
                 //console.log(cookie[u]);
-                if (cookie[u].indexOf("GPYH_AREA") != -1) {
+                if (cookie[u].indexOf("_GPYHAREA") != -1) {
                     area = cookie[u];
                     console.log(cookie[u])
                 }
+                if (cookie[u].indexOf("_GPYHAREA_BASE64") != -1) {
+                    area64 = cookie[u];
+                    console.log(cookie[u])
+                }
+                if (cookie[u].indexOf("UM_distinctid") != -1) {
+                    um = cookie[u];
+                    console.log(cookie[u])
+                }
+
             }
             superagent.post(login_url)
                 .set(base_header)
@@ -60,6 +71,8 @@ function login() {
                     //console.log(cookie);
                     // console.log((area))
                     cookie.push(area);
+                    cookie.push(area64)
+                    cookie.push(um);
                     console.log(cookie);
                     emitter.emit("setCookeie", cookie);
                 })

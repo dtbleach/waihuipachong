@@ -97,6 +97,9 @@ function content(page,key,one,jwt) {
                        items.forEach(function (item) {
                            var fenlei = item.standardname;
                            var tupian = item.imgurl;
+                           if(tupian!=undefined&&tupian!='undefined'){
+                               tupian=tupian.replace("https://","");
+                           }
                            var caizhi = item.materialname;
                            var pinming = item.standardcode;
                            var guige = item.spec;
@@ -110,7 +113,7 @@ function content(page,key,one,jwt) {
                            var price = item.userprice;
                            var source = '三块神铁';
                            console.log(pinming + ' ' + pinpai + ' ' + caizhi + ' ' + guige + ' ' + dengji + ' ' + biaomian + ' ' + fenlei + ' ' + tupian + ' ' + cangku + ' ' + kucun + ' ' + price + ' ' + source);
-                           let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + img + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','三块神铁')"
+                           let sqlquery = "INSERT INTO 外销电商_内销爬虫数据(材质,品名,规格,等级,表面处理,分类,图片,品牌,仓库,库存,包装信息,价格,数据来源) VALUES('" + caizhi + "','" + pinming + "','" + guige + "','" + dengji + "','" + biaomian + "','" + fenlei + "','" + tupian + "','" + pinpai + "','" + cangku + "','" + kucun + "','" + package + "','" + price + "','三块神铁')"
                            sql.query(connectionString, sqlquery, (err, rows) => {
                                //console.log(rows);
                                if(err!=null&&err!=undefined&&err!='undefined'){
