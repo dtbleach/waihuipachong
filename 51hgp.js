@@ -65,7 +65,10 @@ function getContent (cookie) {
                 //console.log($.html());
                 var page = $page.children().eq(0).text();
                 //console.log(page);
+                if(page!=''&&page!=undefined){
+                    page=page.split('/')[1];
 
+                }
                 page = Number(page);
                 var mod = {
                     'key': ck,

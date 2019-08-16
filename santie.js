@@ -47,25 +47,27 @@ function pa() {
 
 
 function content(page,key,one,jwt) {
-    var url='http://api.santie.com/santie-restful/mainPage/getItem?' +
-        '_=' +one+
-        '&' +
+    var url='https://api.santie.com/santie-restful/mainPage/getItem?' +
+        '_=1565924490593&' +
         'sourceType=PC&' +
         'queryType=search&' +
-        'keyword='+key+
-        '&' +
-        'level1Id=&level2Id=&' +
-        'cz=&subType=1&' +
+        'keyword='+key+'&' +
+        'level1Id=&' +
+        'level2Id=&' +
+        'cz=&' +
+        'subType=1&' +
         'categoryId=&' +
-        'districtid=2817&' +
+        'condition=&' +
         'serviceType=&' +
         'sellerType=&' +
-        'condition=&' +
         'containzy=&' +
+        'districtid=2830&' +
         'orderBy=&' +
+        'saleSort=false&' +
         'pageindex='+page+'&' +
         'onlyqty=0&' +
-        'standardid=&levelid=&' +
+        'standardid=&' +
+        'levelid=&' +
         'surfaceid=&' +
         'lengthid=&' +
         'materialid=&' +
@@ -73,8 +75,13 @@ function content(page,key,one,jwt) {
         'toothformid=&' +
         'brandid=&' +
         'czid=&' +
+        'jbcz=&' +
         'diameterid=&' +
-        'santieJwt='+jwt;
+        'voucherType=0&' +
+        'santieJwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiZ3Vlc3QiLCJqdGkiOiI4RjAzOENBQjAzMTY0RDdDQjk5MERFOTJBRkIzNkNDOSIsInVzZXJuYW1lIjoiemhhbmd3dSJ9.-d0GOGbRRDzBJJY8vOVgLjB092bGllDnfbgHkieLb2o'
+
+
+
     var e = request({
         url: url,
         method: 'GET',
